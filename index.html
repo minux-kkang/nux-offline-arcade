@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#101629">
-  <title>미눅스 오프라인 오락실 V3.0</title>
+  <title>미눅스 오프라인 오락실 V3.1</title>
   <style>
     :root{--bg:#0b1020;--card:#151d34;--card2:#1c2744;--text:#f7f8ff;--muted:#aeb8d4;--accent:#7c5cff;--accent2:#24d2b2;--danger:#ff647c;--line:#2b385d;--shadow:0 14px 36px #0007}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -31,7 +31,7 @@
 <main class="app">
   <header><div class="brand"><h1>✈️ 미눅스 오락실</h1><p>인터넷 없이 즐기는 기내 게임</p></div><div class="top-actions"><button class="icon-btn" id="soundBtn" aria-label="효과음">🔇</button><button class="icon-btn hidden" id="homeBtn" aria-label="홈">⌂</button></div></header>
   <section id="homeScreen">
-    <div class="hero"><div class="eyebrow">OFFLINE ARCADE · VERSION 3.0</div><h2>긴 비행도<br>조금은 짧게.</h2><p>모든 게임과 데이터가 이 파일 하나에 들어 있습니다.<br>비행기 모드에서도 그대로 즐겨보세요.</p></div>
+    <div class="hero"><div class="eyebrow">OFFLINE ARCADE · VERSION 3.1</div><h2>긴 비행도<br>조금은 짧게.</h2><p>모든 게임과 데이터가 이 파일 하나에 들어 있습니다.<br>비행기 모드에서도 그대로 즐겨보세요.</p></div>
     <div class="games">
       <button class="game-card" data-game="2048"><span class="badge">혼자</span><div class="game-icon">🔢</div><h3>2048</h3><p>숫자를 합쳐 최고 기록에 도전</p></button>
       <button class="game-card" data-game="world"><span class="badge">3가지 학습</span><div class="game-icon">🌍</div><h3>세계 국기 탐험</h3><p>퀴즈·세계지도·100개국 도감</p></button>
@@ -323,7 +323,53 @@ function fireBrickLaser(now){if(!brickActive('laser',now)||now-brick.laserAt<280
 function brickAction(){if(!brick)return;const now=performance.now(),stuck=brick.balls.filter(b=>b.stuck);if(stuck.length){stuck.forEach((b,i)=>{b.stuck=false;b.vx+=(i-(stuck.length-1)/2)*45});brick.action='play';$('#brickAction').textContent=brickActive('laser',now)?'⚡ 레이저 발사':'공 플레이 중';return}if(brickActive('laser',now)){fireBrickLaser(now);$('#brickAction').textContent='⚡ 레이저 발사'}}
 function loseBrickBall(){brick.lives--;updateBrickHud();if(brick.lives<=0){brick.running=false;cancelAnimationFrame(brickFrame);localStorage.brickBest=Math.max(+(localStorage.brickBest||0),brick.score);updateBrickHud();showBrickOverlay('게임 오버',`${brick.stage}단계 · ${brick.score}점<br>다시 도전하면 배치와 아이템 위치는 같아요.`,true);$('#brickContinue').textContent='이 단계 다시';$('#brickContinue').onclick=()=>{prepareBrick(brick.stage,true);beginBrickGame()};$('#brickNew').textContent='1단계부터';$('#brickNew').onclick=()=>{prepareBrick(1,true);beginBrickGame()};beep(170,.2)}else{resetBrickBall();toast(`생명 ${brick.lives}개 남음`);beep(210,.12)}}
 function finishBrickStage(){brick.running=false;cancelAnimationFrame(brickFrame);brick.score+=500+brick.stage*50;localStorage.brickBest=Math.max(+(localStorage.brickBest||0),brick.score);localStorage.brickUnlocked=Math.max(+(localStorage.brickUnlocked||1),Math.min(30,brick.stage+1));updateBrickHud();if(brick.stage===30){showBrickOverlay('30단계 완주! 🏆',`최종 점수 ${brick.score}점<br>모든 스테이지를 정복했어요.`,true);$('#brickContinue').textContent='다시 1단계';$('#brickContinue').onclick=()=>{prepareBrick(1,true);beginBrickGame()};$('#brickNew').classList.add('hidden')}else{showBrickOverlay(`${brick.stage}단계 완료!`,`점수 ${brick.score}점 · 다음 단계에는 더 단단하고 까다로운 벽돌이 등장해요.`,true);$('#brickContinue').textContent=`${brick.stage+1}단계 시작`;$('#brickContinue').onclick=()=>{prepareBrick(brick.stage+1,false);beginBrickGame()};$('#brickNew').classList.remove('hidden');$('#brickNew').textContent='1단계부터';$('#brickNew').onclick=()=>{prepareBrick(1,true);beginBrickGame()}}beep(860,.16)}
-function updateBricks(dt,now){if(!brickActive('expand',now))brick.paddle.w=130;brick.paddle.x=Math.max(0,Math.min(BW-brick.paddle.w,brick.paddle.x));const speedFactor=brickActive('slow',now)?.75:1;for(const ball of brick.balls){if(ball.stuck){ball.x=brick.paddle.x+brick.paddle.w/2+ball.offset;ball.y=brick.paddle.y-ball.r-2;continue}const steps=3,sd=dt/steps*speedFactor;for(let q=0;q<steps;q++){ball.x+=ball.vx*sd;ball.y+=ball.vy*sd;if(ball.x-ball.r<0){ball.x=ball.r;ball.vx=Math.abs(ball.vx)}if(ball.x+ball.r>BW){ball.x=BW-ball.r;ball.vx=-Math.abs(ball.vx)}if(ball.y-ball.r<0){ball.y=ball.r;ball.vy=Math.abs(ball.vy)}const p=brick.paddle;if(ball.vy>0&&ball.y+ball.r>=p.y&&ball.y-ball.r<=p.y+p.h&&ball.x>=p.x-ball.r&&ball.x<=p.x+p.w+ball.r){ball.y=p.y-ball.r;const rel=(ball.x-(p.x+p.w/2))/(p.w/2),sp=Math.min(680,Math.hypot(ball.vx,ball.vy)*1.018);ball.vx=sp*Math.sin(rel*1.08);ball.vy=-Math.max(145,sp*Math.cos(rel*1.08));if(brickActive('magnet',now)){ball.stuck=true;ball.offset=Math.max(-p.w*.4,Math.min(p.w*.4,ball.x-(p.x+p.w/2)));$('#brickAction').textContent='자석 공 발사'}}for(const b of brick.bricks){if(!b.hp)continue;const x=brickPos(b,now);if(ball.x+ball.r<x||ball.x-ball.r>x+b.w||ball.y+ball.r<b.y||ball.y-ball.r>b.y+b.h)continue;if(b.hp<0){ball.vy*=-1;break}hitBrick(b,now,x);if(!brickActive('pierce',now)){const left=Math.abs(ball.x+ball.r-x),right=Math.abs(x+b.w-(ball.x-ball.r)),top=Math.abs(ball.y+ball.r-b.y),bottom=Math.abs(b.y+b.h-(ball.y-ball.r));Math.min(left,right)<Math.min(top,bottom)?ball.vx*=-1:ball.vy*=-1;break}}}}brick.balls=brick.balls.filter(b=>{if(b.y-b.r<=BH)return true;if(brick.shield){brick.shield--;b.y=BH-24;b.vy=-Math.abs(b.vy);beep(460,.08);return true}return false});if(!brick.balls.length){loseBrickBall();return}brick.drops.forEach(d=>{d.y+=d.vy*dt;d.spin+=dt*4});brick.drops=brick.drops.filter(d=>{const p=brick.paddle;if(d.y+18>=p.y&&d.y-18<=p.y+p.h&&d.x>=p.x&&d.x<=p.x+p.w){applyBrickItem(d.type,now);return false}return d.y<BH+30});brick.lasers.forEach(l=>l.y-=640*dt);for(const l of brick.lasers){for(const b of brick.bricks){if(!b.hp)continue;const x=brickPos(b,now);if(l.x>=x&&l.x<=x+b.w&&l.y<=b.y+b.h&&l.y>=b.y-18){if(b.hp>0)hitBrick(b,now,x);l.y=-30;break}}}brick.lasers=brick.lasers.filter(l=>l.y>-20);if(!brick.bricks.some(b=>b.hp>0))finishBrickStage();updateBrickEffects(now)}
+function bounceOnPaddle(ball,p,oldX,oldY,now){
+  if(ball.vy<=0||ball.y+ball.r<p.y||ball.y-ball.r>p.y+p.h||ball.x+ball.r<p.x||ball.x-ball.r>p.x+p.w)return;
+  const cameFromTop=oldY+ball.r<=p.y+2;
+  if(cameFromTop){
+    ball.y=p.y-ball.r-.5;
+    const rel=Math.max(-1,Math.min(1,(ball.x-(p.x+p.w/2))/(p.w/2))),sp=Math.min(680,Math.hypot(ball.vx,ball.vy)*1.018);
+    ball.vx=sp*Math.sin(rel*1.08);ball.vy=-Math.max(145,sp*Math.cos(rel*1.08));
+    if(brickActive('magnet',now)){ball.stuck=true;ball.offset=Math.max(-p.w*.4,Math.min(p.w*.4,ball.x-(p.x+p.w/2)));$('#brickAction').textContent='자석 공 발사'}
+  }else{
+    const fromLeft=oldX<=p.x;
+    ball.x=fromLeft?p.x-ball.r-.5:p.x+p.w+ball.r+.5;
+    ball.vx=fromLeft?-Math.abs(ball.vx):Math.abs(ball.vx);
+  }
+}
+function updateBricks(dt,now){
+  if(!brickActive('expand',now))brick.paddle.w=130;
+  brick.paddle.x=Math.max(0,Math.min(BW-brick.paddle.w,brick.paddle.x));
+  const speedFactor=brickActive('slow',now)?.75:1;
+  for(const ball of brick.balls){
+    if(ball.stuck){ball.x=brick.paddle.x+brick.paddle.w/2+ball.offset;ball.y=brick.paddle.y-ball.r-2;continue}
+    const steps=3,sd=dt/steps*speedFactor;
+    for(let q=0;q<steps;q++){
+      const oldX=ball.x,oldY=ball.y;
+      ball.x+=ball.vx*sd;ball.y+=ball.vy*sd;
+      if(ball.x-ball.r<0){ball.x=ball.r;ball.vx=Math.abs(ball.vx)}
+      if(ball.x+ball.r>BW){ball.x=BW-ball.r;ball.vx=-Math.abs(ball.vx)}
+      if(ball.y-ball.r<0){ball.y=ball.r;ball.vy=Math.abs(ball.vy)}
+      bounceOnPaddle(ball,brick.paddle,oldX,oldY,now);
+      for(const b of brick.bricks){
+        if(!b.hp)continue;const x=brickPos(b,now);
+        if(ball.x+ball.r<x||ball.x-ball.r>x+b.w||ball.y+ball.r<b.y||ball.y-ball.r>b.y+b.h)continue;
+        if(b.hp<0){ball.vy*=-1;break}
+        hitBrick(b,now,x);
+        if(!brickActive('pierce',now)){const left=Math.abs(ball.x+ball.r-x),right=Math.abs(x+b.w-(ball.x-ball.r)),top=Math.abs(ball.y+ball.r-b.y),bottom=Math.abs(b.y+b.h-(ball.y-ball.r));Math.min(left,right)<Math.min(top,bottom)?ball.vx*=-1:ball.vy*=-1;break}
+      }
+    }
+  }
+  brick.balls=brick.balls.filter(b=>{if(b.y-b.r<=BH)return true;if(brick.shield){brick.shield--;b.y=BH-24;b.vy=-Math.abs(b.vy);beep(460,.08);return true}return false});
+  if(!brick.balls.length){loseBrickBall();return}
+  brick.drops.forEach(d=>{d.y+=d.vy*dt;d.spin+=dt*4});
+  brick.drops=brick.drops.filter(d=>{const p=brick.paddle;if(d.y+18>=p.y&&d.y-18<=p.y+p.h&&d.x>=p.x&&d.x<=p.x+p.w){applyBrickItem(d.type,now);return false}return d.y<BH+30});
+  brick.lasers.forEach(l=>l.y-=640*dt);
+  for(const l of brick.lasers)for(const b of brick.bricks){if(!b.hp)continue;const x=brickPos(b,now);if(l.x>=x&&l.x<=x+b.w&&l.y<=b.y+b.h&&l.y>=b.y-18){if(b.hp>0)hitBrick(b,now,x);l.y=-30;break}}
+  brick.lasers=brick.lasers.filter(l=>l.y>-20);
+  if(!brick.bricks.some(b=>b.hp>0))finishBrickStage();
+  updateBrickEffects(now)
+}
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
 function drawBricks(now=performance.now()){BX.clearRect(0,0,BW,BH);const bg=BX.createLinearGradient(0,0,0,BH);bg.addColorStop(0,'#101d38');bg.addColorStop(1,'#050b16');BX.fillStyle=bg;BX.fillRect(0,0,BW,BH);BX.strokeStyle='#ffffff10';BX.lineWidth=1;for(let y=50;y<BH;y+=70){BX.beginPath();BX.moveTo(0,y);BX.lineTo(BW,y);BX.stroke()}if(!brick)return;brick.bricks.forEach((b,i)=>{if(!b.hp)return;const x=brickPos(b,now);roundRect(BX,x,b.y,b.w,b.h,7);if(b.hp<0)BX.fillStyle='#596174';else{const hue=(brick.stage*17+i*9)%360;BX.fillStyle=`hsl(${hue} 65% ${b.hp>1?42:55}%)`}BX.fill();BX.strokeStyle=b.item?'#fff4a3':'#ffffff35';BX.lineWidth=b.item?3:1;BX.stroke();if(b.hp>1){BX.fillStyle='#fff';BX.font='700 15px system-ui';BX.textAlign='center';BX.fillText(b.hp,x+b.w/2,b.y+22)}if(b.item){BX.fillStyle='#fff7b5';BX.font='900 18px system-ui';BX.textAlign='center';BX.fillText('✦',x+b.w/2,b.y+23)}});brick.drops.forEach(d=>{BX.save();BX.translate(d.x,d.y);BX.rotate(Math.sin(d.spin)*.12);roundRect(BX,-27,-18,54,36,12);BX.fillStyle='#f5f7ff';BX.fill();BX.strokeStyle='#ffe978';BX.lineWidth=3;BX.stroke();BX.fillStyle='#17213a';BX.font='800 14px system-ui';BX.textAlign='center';BX.textBaseline='middle';BX.fillText(brickItems[d.type].icon,0,1);BX.restore()});brick.lasers.forEach(l=>{BX.strokeStyle='#ffe978';BX.lineWidth=5;BX.beginPath();BX.moveTo(l.x,l.y);BX.lineTo(l.x,l.y+20);BX.stroke()});if(brick.shield){BX.strokeStyle='#5be2ff';BX.lineWidth=5;BX.beginPath();BX.moveTo(12,BH-12);BX.lineTo(BW-12,BH-12);BX.stroke()}roundRect(BX,brick.paddle.x,brick.paddle.y,brick.paddle.w,brick.paddle.h,9);BX.fillStyle=brickActive('laser',now)?'#ffe978':brickActive('magnet',now)?'#dc8cff':'#5be2ff';BX.fill();brick.balls.forEach(b=>{BX.beginPath();BX.arc(b.x,b.y,b.r,0,Math.PI*2);BX.fillStyle=brickActive('pierce',now)?'#ff7b5b':'#fff';BX.shadowColor=BX.fillStyle;BX.shadowBlur=14;BX.fill();BX.shadowBlur=0})}
 function brickLoop(now){if(!brick||!brick.running)return;const dt=Math.min(.026,(now-brickLast)/1000||0);brickLast=now;updateBricks(dt,now);drawBricks(now);if(brick.running)brickFrame=requestAnimationFrame(brickLoop)}
