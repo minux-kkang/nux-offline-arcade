@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#101629">
-  <title>미눅스 오프라인 오락실 V3.1</title>
+  <title>미눅스 오프라인 오락실 V3.2</title>
   <style>
     :root{--bg:#0b1020;--card:#151d34;--card2:#1c2744;--text:#f7f8ff;--muted:#aeb8d4;--accent:#7c5cff;--accent2:#24d2b2;--danger:#ff647c;--line:#2b385d;--shadow:0 14px 36px #0007}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -31,7 +31,7 @@
 <main class="app">
   <header><div class="brand"><h1>✈️ 미눅스 오락실</h1><p>인터넷 없이 즐기는 기내 게임</p></div><div class="top-actions"><button class="icon-btn" id="soundBtn" aria-label="효과음">🔇</button><button class="icon-btn hidden" id="homeBtn" aria-label="홈">⌂</button></div></header>
   <section id="homeScreen">
-    <div class="hero"><div class="eyebrow">OFFLINE ARCADE · VERSION 3.1</div><h2>긴 비행도<br>조금은 짧게.</h2><p>모든 게임과 데이터가 이 파일 하나에 들어 있습니다.<br>비행기 모드에서도 그대로 즐겨보세요.</p></div>
+    <div class="hero"><div class="eyebrow">OFFLINE ARCADE · VERSION 3.2</div><h2>긴 비행도<br>조금은 짧게.</h2><p>모든 게임과 데이터가 이 파일 하나에 들어 있습니다.<br>비행기 모드에서도 그대로 즐겨보세요.</p></div>
     <div class="games">
       <button class="game-card" data-game="2048"><span class="badge">혼자</span><div class="game-icon">🔢</div><h3>2048</h3><p>숫자를 합쳐 최고 기록에 도전</p></button>
       <button class="game-card" data-game="world"><span class="badge">3가지 학습</span><div class="game-icon">🌍</div><h3>세계 국기 탐험</h3><p>퀴즈·세계지도·100개국 도감</p></button>
@@ -301,13 +301,13 @@ $('#atlasSearch').addEventListener('input',renderAtlas);
 
 // Brick Breaker
 const BC=$('#brickCanvas'),BX=BC.getContext('2d'),BW=640,BH=900;
-const brickItems={expand:{icon:'↔',name:'패들 확장',ms:12000},slow:{icon:'🐢',name:'슬로우',ms:10000},pierce:{icon:'🔥',name:'관통탄',ms:8000},laser:{icon:'⚡',name:'레이저',ms:8000},magnet:{icon:'🧲',name:'자석',ms:10000},shield:{icon:'🛡',name:'보호막',ms:0},multi:{icon:'●●●',name:'멀티볼',ms:0},double:{icon:'×2',name:'점수 2배',ms:12000}};
+const brickItems={expand:{icon:'↔',name:'패들 확장',ms:12000},slow:{icon:'🐢',name:'감속',ms:10000},fast:{icon:'🚀',name:'가속',ms:8000},pierce:{icon:'🔥',name:'관통탄',ms:8000},bomb:{icon:'💥',name:'폭발탄',ms:9000},giant:{icon:'🔵',name:'대형 공',ms:10000},laser:{icon:'⚡',name:'레이저',ms:8000},magnet:{icon:'🧲',name:'자석',ms:10000},shield:{icon:'🛡',name:'보호막',ms:0},multi:{icon:'●●●',name:'멀티볼',ms:0},double:{icon:'×2',name:'점수 2배',ms:12000},life:{icon:'♥',name:'생명 추가',ms:0}};
 let brick=null,brickFrame=0,brickLast=0,brickEffectPaint=0;
 function brickRng(seed){return()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}}
 function makeBrickStage(stage){const rnd=brickRng(stage*7919),cols=8,rows=Math.min(5+Math.floor((stage-1)/5),8),gap=7,w=(BW-48-gap*(cols-1))/cols,h=34,list=[];for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){let on=true,p=(stage-1)%10;if(p===1)on=(r+c)%2===0||r===0;if(p===2)on=c>=r%4&&c<cols-r%4;if(p===3)on=c===0||c===cols-1||r===0||r===rows-1;if(p===4)on=Math.abs(c-3.5)+Math.abs(r-(rows-1)/2)<5;if(p===5)on=(c+r)%3!==1;if(p===6)on=c===Math.floor(r/2)||c===cols-1-Math.floor(r/2)||r===0;if(p===7)on=r%2===0||c%3===0;if(p===8)on=Math.sin((c+1)*(r+1))>.05||r===0;if(p===9)on=!(c>=2&&c<=5&&r>=2&&r<=rows-2);if(!on)continue;let hp=1;if(stage>=8&&rnd()<Math.min(.18+(stage-8)*.012,.43))hp=2;if(stage>=24&&rnd()<.13)hp=3;const solid=stage>=18&&rnd()<Math.min(.035+(stage-18)*.006,.09);list.push({x:24+c*(w+gap),y:82+r*(h+7),w,h,hp:solid?-1:hp,max:solid?-1:hp,item:null,moving:stage>=12&&r%3===1&&rnd()<.32,phase:rnd()*Math.PI*2})}const breakable=list.filter(b=>b.hp>0),unlocked=['expand'];if(stage>=4)unlocked.push('multi');if(stage>=7)unlocked.push('slow');if(stage>=10)unlocked.push('shield');if(stage>=13)unlocked.push('double');if(stage>=15)unlocked.push('pierce');if(stage>=19)unlocked.push('magnet');if(stage>=21)unlocked.push('laser');const count=Math.min(2+Math.floor(stage/7),5,breakable.length);for(let i=0;i<count;i++){const at=Math.floor(rnd()*breakable.length),b=breakable.splice(at,1)[0];b.item=unlocked[Math.floor(rnd()*unlocked.length)]}return list}
 function newBrickBall(stuck=true){const speed=430+Math.min(brick.stage*8,170),dir=(Math.random()*.7-.35);return{x:brick.paddle.x+brick.paddle.w/2,y:brick.paddle.y-13,r:9,vx:Math.sin(dir)*speed,vy:-Math.cos(dir)*speed,stuck,offset:0}}
 function resetBrickBall(){brick.balls=[newBrickBall(true)];brick.action='launch';$('#brickAction').textContent='공 발사'}
-function prepareBrick(stage,newRun=false){cancelAnimationFrame(brickFrame);const score=newRun?0:(brick?brick.score:0),lives=newRun?3:(brick?brick.lives:3);brick={stage,score,lives,bricks:makeBrickStage(stage),balls:[],drops:[],lasers:[],effects:{},shield:0,paddle:{x:BW/2-65,y:835,w:130,h:18},running:false,pausedAt:0,action:'launch',laserAt:0};resetBrickBall();updateBrickHud();drawBricks()}
+function prepareBrick(stage,newRun=false){cancelAnimationFrame(brickFrame);const score=newRun?0:(brick?brick.score:0),lives=newRun?3:(brick?brick.lives:3);brick={stage,score,lives,bricks:makeBrickStage(stage),balls:[],drops:[],lasers:[],bursts:[],effects:{},shield:0,itemPity:0,paddle:{x:BW/2-65,y:835,w:130,h:18},running:false,pausedAt:0,action:'launch',laserAt:0};resetBrickBall();updateBrickHud();drawBricks()}
 function openBricks(){const unlocked=Math.max(1,Math.min(30,+(localStorage.brickUnlocked||1)));$('#brickNew').classList.remove('hidden');if(!brick)prepareBrick(unlocked,true);if(brick.pausedAt){showBrickOverlay('일시정지','다시 돌아왔어요. 멈춘 지점부터 계속할 수 있어요.',true);$('#brickContinue').textContent='계속하기';$('#brickContinue').onclick=beginBrickGame}else{showBrickOverlay('벽돌깨기',`현재 ${unlocked}단계까지 열렸어요. 반짝이는 벽돌을 깨고 떨어지는 아이템을 받아보세요.`,true);$('#brickContinue').textContent=unlocked>1?`${unlocked}단계 이어하기`:'게임 시작';$('#brickContinue').onclick=()=>{prepareBrick(unlocked,true);beginBrickGame()}}$('#brickNew').textContent='1단계부터';$('#brickNew').onclick=()=>{prepareBrick(1,true);beginBrickGame()};drawBricks()}
 function showBrickOverlay(title,text,buttons=true){$('#brickOverlayTitle').textContent=title;$('#brickOverlayText').innerHTML=text;$('#brickOverlayActions').classList.toggle('hidden',!buttons);$('#brickOverlay').classList.remove('hidden')}
 function beginBrickGame(){const paused=brick.pausedAt;if(paused){const gap=performance.now()-paused;Object.keys(brick.effects).forEach(k=>brick.effects[k]+=gap)}brick.pausedAt=0;brick.running=true;$('#brickOverlay').classList.add('hidden');$('#brickPause').textContent='일시정지';brickLast=performance.now();cancelAnimationFrame(brickFrame);brickFrame=requestAnimationFrame(brickLoop)}
@@ -316,8 +316,10 @@ function updateBrickHud(){if(!brick)return;$('#brickStage').textContent=`${brick
 function brickActive(k,now=performance.now()){return (brick.effects[k]||0)>now}
 function updateBrickEffects(now){if(now-brickEffectPaint<180)return;brickEffectPaint=now;const box=$('#brickEffects'),active=Object.entries(brick.effects).filter(([,end])=>end>now);box.innerHTML='';active.forEach(([k,end])=>{const s=document.createElement('span');s.className='hot';s.textContent=`${brickItems[k].icon} ${brickItems[k].name} ${Math.ceil((end-now)/1000)}초`;box.appendChild(s)});if(brick.shield){const s=document.createElement('span');s.className='hot';s.textContent=`🛡 보호막 ${brick.shield}회`;box.appendChild(s)}if(!box.children.length){const s=document.createElement('span');s.textContent='활성 아이템 없음';box.appendChild(s)}}
 function brickPos(b,now){return b.x+(b.moving?Math.sin(now/650+b.phase)*16:0)}
-function spawnBrickItem(b,x,now){if(!b.item)return;brick.drops.push({type:b.item,x:x+b.w/2,y:b.y+b.h/2,vy:155,spin:0});b.item=null}
-function applyBrickItem(type,now){const it=brickItems[type];if(it.ms){brick.effects[type]=Math.max(brick.effects[type]||0,now)+it.ms}else if(type==='shield'){brick.shield=Math.min(2,brick.shield+1)}else if(type==='multi'){const src=brick.balls.find(b=>!b.stuck)||brick.balls[0];if(src){[-.48,.48].forEach(a=>{const cs=Math.cos(a),sn=Math.sin(a);brick.balls.push({...src,vx:src.vx*cs-src.vy*sn,vy:src.vx*sn+src.vy*cs,stuck:false})})}}if(type==='expand')brick.paddle.w=185;if(type==='laser'&&!brick.balls.some(b=>b.stuck))$('#brickAction').textContent='⚡ 레이저 발사';beep(760,.08);toast(`${it.icon} ${it.name}!`);updateBrickEffects(now)}
+function availableBrickItems(stage){const a=['expand','multi','slow'];if(stage>=4)a.push('fast');if(stage>=7)a.push('shield');if(stage>=10)a.push('giant');if(stage>=12)a.push('double');if(stage>=15)a.push('pierce');if(stage>=17)a.push('bomb');if(stage>=19)a.push('magnet');if(stage>=21)a.push('laser');if(stage>=24)a.push('life');return a}
+function spawnBrickItem(b,x,now){brick.itemPity++;const guaranteed=!!b.item,drop=guaranteed||Math.random()<.14||brick.itemPity>=9;b.item=null;if(!drop)return;brick.itemPity=0;const pool=availableBrickItems(brick.stage),type=pool[Math.floor(Math.random()*pool.length)];brick.drops.push({type,x:x+b.w/2,y:b.y+b.h/2,vy:155,spin:0})}
+function applyBrickItem(type,now){const it=brickItems[type];if(it.ms){brick.effects[type]=Math.max(brick.effects[type]||0,now)+it.ms}else if(type==='shield'){brick.shield=Math.min(2,brick.shield+1)}else if(type==='life'){brick.lives=Math.min(5,brick.lives+1);updateBrickHud()}else if(type==='multi'){const src=brick.balls.find(b=>!b.stuck)||brick.balls[0];if(src){[-.48,.48].forEach(a=>{const cs=Math.cos(a),sn=Math.sin(a);brick.balls.push({...src,vx:src.vx*cs-src.vy*sn,vy:src.vx*sn+src.vy*cs,stuck:false})})}}if(type==='expand')brick.paddle.w=185;if(type==='giant')brick.balls.forEach(b=>b.r=15);if(type==='laser'&&!brick.balls.some(b=>b.stuck))$('#brickAction').textContent='⚡ 레이저 발사';beep(760,.08);toast(`${it.icon} ${it.name}!`);updateBrickEffects(now)}
+function explodeBrickArea(cx,cy,now){brick.bursts.push({x:cx,y:cy,start:now});for(const b of brick.bricks){if(b.hp<=0)continue;const x=brickPos(b,now),dx=x+b.w/2-cx,dy=b.y+b.h/2-cy;if(Math.hypot(dx,dy)>112)continue;while(b.hp>0)hitBrick(b,now,x)}beep(130,.11)}
 function hitBrick(b,now,x){if(b.hp<0)return false;b.hp--;const mult=brickActive('double',now)?2:1;brick.score+=10*mult*(b.max||1);if(b.hp===0){brick.score+=10*mult;spawnBrickItem(b,x,now)}updateBrickHud();return true}
 function fireBrickLaser(now){if(!brickActive('laser',now)||now-brick.laserAt<280)return;brick.laserAt=now;brick.lasers.push({x:brick.paddle.x+15,y:brick.paddle.y},{x:brick.paddle.x+brick.paddle.w-15,y:brick.paddle.y});beep(900,.03)}
 function brickAction(){if(!brick)return;const now=performance.now(),stuck=brick.balls.filter(b=>b.stuck);if(stuck.length){stuck.forEach((b,i)=>{b.stuck=false;b.vx+=(i-(stuck.length-1)/2)*45});brick.action='play';$('#brickAction').textContent=brickActive('laser',now)?'⚡ 레이저 발사':'공 플레이 중';return}if(brickActive('laser',now)){fireBrickLaser(now);$('#brickAction').textContent='⚡ 레이저 발사'}}
@@ -340,7 +342,8 @@ function bounceOnPaddle(ball,p,oldX,oldY,now){
 function updateBricks(dt,now){
   if(!brickActive('expand',now))brick.paddle.w=130;
   brick.paddle.x=Math.max(0,Math.min(BW-brick.paddle.w,brick.paddle.x));
-  const speedFactor=brickActive('slow',now)?.75:1;
+  brick.balls.forEach(b=>b.r=brickActive('giant',now)?15:9);
+  const speedFactor=brickActive('slow',now)?.75:brickActive('fast',now)?1.32:1;
   for(const ball of brick.balls){
     if(ball.stuck){ball.x=brick.paddle.x+brick.paddle.w/2+ball.offset;ball.y=brick.paddle.y-ball.r-2;continue}
     const steps=3,sd=dt/steps*speedFactor;
@@ -355,7 +358,7 @@ function updateBricks(dt,now){
         if(!b.hp)continue;const x=brickPos(b,now);
         if(ball.x+ball.r<x||ball.x-ball.r>x+b.w||ball.y+ball.r<b.y||ball.y-ball.r>b.y+b.h)continue;
         if(b.hp<0){ball.vy*=-1;break}
-        hitBrick(b,now,x);
+        hitBrick(b,now,x);if(brickActive('bomb',now))explodeBrickArea(x+b.w/2,b.y+b.h/2,now);
         if(!brickActive('pierce',now)){const left=Math.abs(ball.x+ball.r-x),right=Math.abs(x+b.w-(ball.x-ball.r)),top=Math.abs(ball.y+ball.r-b.y),bottom=Math.abs(b.y+b.h-(ball.y-ball.r));Math.min(left,right)<Math.min(top,bottom)?ball.vx*=-1:ball.vy*=-1;break}
       }
     }
@@ -363,6 +366,7 @@ function updateBricks(dt,now){
   brick.balls=brick.balls.filter(b=>{if(b.y-b.r<=BH)return true;if(brick.shield){brick.shield--;b.y=BH-24;b.vy=-Math.abs(b.vy);beep(460,.08);return true}return false});
   if(!brick.balls.length){loseBrickBall();return}
   brick.drops.forEach(d=>{d.y+=d.vy*dt;d.spin+=dt*4});
+  brick.bursts=brick.bursts.filter(x=>now-x.start<420);
   brick.drops=brick.drops.filter(d=>{const p=brick.paddle;if(d.y+18>=p.y&&d.y-18<=p.y+p.h&&d.x>=p.x&&d.x<=p.x+p.w){applyBrickItem(d.type,now);return false}return d.y<BH+30});
   brick.lasers.forEach(l=>l.y-=640*dt);
   for(const l of brick.lasers)for(const b of brick.bricks){if(!b.hp)continue;const x=brickPos(b,now);if(l.x>=x&&l.x<=x+b.w&&l.y<=b.y+b.h&&l.y>=b.y-18){if(b.hp>0)hitBrick(b,now,x);l.y=-30;break}}
@@ -372,7 +376,8 @@ function updateBricks(dt,now){
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
 function drawBricks(now=performance.now()){BX.clearRect(0,0,BW,BH);const bg=BX.createLinearGradient(0,0,0,BH);bg.addColorStop(0,'#101d38');bg.addColorStop(1,'#050b16');BX.fillStyle=bg;BX.fillRect(0,0,BW,BH);BX.strokeStyle='#ffffff10';BX.lineWidth=1;for(let y=50;y<BH;y+=70){BX.beginPath();BX.moveTo(0,y);BX.lineTo(BW,y);BX.stroke()}if(!brick)return;brick.bricks.forEach((b,i)=>{if(!b.hp)return;const x=brickPos(b,now);roundRect(BX,x,b.y,b.w,b.h,7);if(b.hp<0)BX.fillStyle='#596174';else{const hue=(brick.stage*17+i*9)%360;BX.fillStyle=`hsl(${hue} 65% ${b.hp>1?42:55}%)`}BX.fill();BX.strokeStyle=b.item?'#fff4a3':'#ffffff35';BX.lineWidth=b.item?3:1;BX.stroke();if(b.hp>1){BX.fillStyle='#fff';BX.font='700 15px system-ui';BX.textAlign='center';BX.fillText(b.hp,x+b.w/2,b.y+22)}if(b.item){BX.fillStyle='#fff7b5';BX.font='900 18px system-ui';BX.textAlign='center';BX.fillText('✦',x+b.w/2,b.y+23)}});brick.drops.forEach(d=>{BX.save();BX.translate(d.x,d.y);BX.rotate(Math.sin(d.spin)*.12);roundRect(BX,-27,-18,54,36,12);BX.fillStyle='#f5f7ff';BX.fill();BX.strokeStyle='#ffe978';BX.lineWidth=3;BX.stroke();BX.fillStyle='#17213a';BX.font='800 14px system-ui';BX.textAlign='center';BX.textBaseline='middle';BX.fillText(brickItems[d.type].icon,0,1);BX.restore()});brick.lasers.forEach(l=>{BX.strokeStyle='#ffe978';BX.lineWidth=5;BX.beginPath();BX.moveTo(l.x,l.y);BX.lineTo(l.x,l.y+20);BX.stroke()});if(brick.shield){BX.strokeStyle='#5be2ff';BX.lineWidth=5;BX.beginPath();BX.moveTo(12,BH-12);BX.lineTo(BW-12,BH-12);BX.stroke()}roundRect(BX,brick.paddle.x,brick.paddle.y,brick.paddle.w,brick.paddle.h,9);BX.fillStyle=brickActive('laser',now)?'#ffe978':brickActive('magnet',now)?'#dc8cff':'#5be2ff';BX.fill();brick.balls.forEach(b=>{BX.beginPath();BX.arc(b.x,b.y,b.r,0,Math.PI*2);BX.fillStyle=brickActive('pierce',now)?'#ff7b5b':'#fff';BX.shadowColor=BX.fillStyle;BX.shadowBlur=14;BX.fill();BX.shadowBlur=0})}
-function brickLoop(now){if(!brick||!brick.running)return;const dt=Math.min(.026,(now-brickLast)/1000||0);brickLast=now;updateBricks(dt,now);drawBricks(now);if(brick.running)brickFrame=requestAnimationFrame(brickLoop)}
+function drawBrickBursts(now){brick.bursts.forEach(b=>{const p=Math.min(1,(now-b.start)/420),r=28+p*105;BX.save();BX.globalAlpha=1-p;BX.strokeStyle='#ffcf54';BX.lineWidth=10*(1-p)+2;BX.beginPath();BX.arc(b.x,b.y,r,0,Math.PI*2);BX.stroke();BX.fillStyle='#ff7b3855';BX.beginPath();BX.arc(b.x,b.y,r*.62,0,Math.PI*2);BX.fill();BX.restore()})}
+function brickLoop(now){if(!brick||!brick.running)return;const dt=Math.min(.026,(now-brickLast)/1000||0);brickLast=now;updateBricks(dt,now);drawBricks(now);drawBrickBursts(now);if(brick.running)brickFrame=requestAnimationFrame(brickLoop)}
 function moveBrickPaddle(e){if(!brick)return;const r=BC.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*BW;brick.paddle.x=Math.max(0,Math.min(BW-brick.paddle.w,x-brick.paddle.w/2));if(!brick.running)drawBricks()}
 BC.addEventListener('pointerdown',e=>{e.preventDefault();moveBrickPaddle(e);BC.setPointerCapture(e.pointerId);if(brick&&brick.running)brickAction()});BC.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch')moveBrickPaddle(e)});$('#brickAction').onclick=()=>{if(brick&&!brick.running&&$('#brickOverlay').classList.contains('hidden'))beginBrickGame();brickAction()};$('#brickPause').onclick=()=>brick&&brick.running?pauseBrickGame():beginBrickGame();$('#brickRestart').onclick=()=>{if(!brick)return;prepareBrick(brick.stage,false);beginBrickGame()};document.addEventListener('visibilitychange',()=>{if(document.hidden&&brick&&brick.running)pauseBrickGame(true)});
 
